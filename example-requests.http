@@ -1,0 +1,90 @@
+### POST to create a user
+POST http://localhost:9090/user/create
+
+> {%
+    var apiKey = response.body.id + ":" + response.body.apiKey;
+    client.log("api key: " + apiKey)
+    client.global.set('apiKey', apiKey)
+%}
+
+### POST to create a operator user
+POST http://localhost:9090/user/create?role=operator
+
+> {%
+    var apiKey = response.body.id + ":" + response.body.apiKey;
+    client.log("operator api key: " + apiKey)
+    client.global.set('operatorApiKey', apiKey)
+%}
+
+### POST to open an account
+POST http://localhost:9090/account/open
+X-API-KEY: {{apiKey}}
+
+> {%
+    var accountId = response.body.accountId
+    client.log("account id: " + accountId)
+    client.global.set('accountId', accountId)
+%}
+
+### POST to open an account
+POST http://localhost:9090/account/open_loan
+Content-Type: application/json
+X-API-KEY: {{apiKey}}
+
+{
+    "amount": "$5000"
+}
+
+> {%
+    var loanId = response.body.accountId
+    client.log("loan id: " + loanId)
+    client.global.set('loanId', loanId)
+%}
+
+### POST to close an account
+POST http://localhost:9090/account/close/{{accountId}}
+X-API-KEY: {{apiKey}}
+
+> {%
+    var accountId = response.body.accountId
+    client.log("account id: " + accountId)
+    client.global.set('accountId', accountId)
+%}
+
+### POST to deposit into an account
+POST http://localhost:9090/account/transaction/{{accountId}}
+Content-Type: application/json
+X-API-KEY: {{apiKey}}
+
+{
+  "type": "deposit",
+  "amount": "5.25"
+}
+
+### POST to deposit into an loan account
+POST http://localhost:9090/account/transaction/{{loanId}}
+Content-Type: application/json
+X-API-KEY: {{apiKey}}
+
+{
+  "type": "deposit",
+  "amount": "5.25"
+}
+
+### POST to withdraw into an account
+POST http://localhost:9090/account/transaction/{{accountId}}
+Content-Type: application/json
+X-API-KEY: {{apiKey}}
+
+{
+  "type": "withdrawal",
+  "amount": "2.25"
+}
+
+### Get account list
+GET http://localhost:9090/account/
+X-API-KEY: {{apiKey}}
+
+### Get operating cash
+GET http://localhost:9090/operations/cash
+X-API-KEY: {{operatorApiKey}}
